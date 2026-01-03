@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bloom 💜</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --lav:#b89cff;
+  --deep:#6f5cc2;
+  --soft:#f4efff;
+}
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#e9dfff,#cbb7ff);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.card{
+  background:rgba(255,255,255,0.96);
+  width:95%;
+  max-width:800px;
+  padding:30px;
+  border-radius:30px;
+  box-shadow:0 25px 50px rgba(111,92,194,0.25);
+  animation:fade 1s ease;
+}
+@keyframes fade{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+h1{text-align:center;color:var(--deep);}
+h2{color:var(--lav);}
+button{
+  width:100%;
+  padding:14px;
+  margin:8px 0;
+  border:none;
+  border-radius:25px;
+  background:linear-gradient(135deg,var(--lav),#e6d9ff);
+  color:#fff;
+  font-size:15px;
+  cursor:pointer;
+  transition:.3s;
+}
+button:hover{transform:scale(1.03);}
+.progress{
+  height:8px;
+  background:#eee;
+  border-radius:10px;
+  overflow:hidden;
+  margin:15px 0;
+}
+.progress div{
+  height:100%;
+  background:var(--deep);
+  width:0%;
+  transition:.4s;
+}
+.hidden{display:none;}
+.result{line-height:1.7;}
+</style>
+</head>
+<body>
+
+<div class="card">
+<h1>🌸 Bloom</h1>
+<div id="welcome">
+  <button id="startBtn">Start Bloom Quiz 💜</button>
+</div>
+<div class="progress"><div id="bar"></div></div>
+<div id="quiz" class="hidden">
+  <h2 id="question"></h2>
+  <div id="answers"></div>
+</div>
+<div id="result" class="hidden">
+  <h2 id="resultTitle"></h2>
+  <div id="resultText" class="result"></div>
+  <button onclick="location.reload()">Check in again 💜</button>
+</div>
+</div>
+
+<!-- All 108 questions stored as JSON string to prevent browser cutoff -->
+<script id="questions-data" type="application/json">
+[
+{"q":"How did you sleep last night?","a":[{"t":"Restful","s":0},{"t":"Light sleep","s":1},{"t":"Barely slept","s":2}]},
+{"q":"How does your body feel?","a":[{"t":"Relaxed","s":0},{"t":"A bit tense","s":1},{"t":"Very tired","s":2}]},
+{"q":"What’s your mental energy like?","a":[{"t":"Clear","s":0},{"t":"Foggy","s":1},{"t":"Overloaded","s":2}]},
+{"q":"How are your emotions today?","a":[{"t":"Stable","s":0},{"t":"Up & down","s":1},{"t":"Very heavy","s":2}]},
+{"q":"What do you need most right now?","a":[{"t":"Rest","s":2},{"t":"Comfort","s":1},{"t":"Distraction","s":1}]},
+{"q":"How kind are you being to yourself?","a":[{"t":"Very kind","s":0},{"t":"Trying","s":1},{"t":"Very critical","s":2}]},
+{"q":"How supported do you feel?","a":[{"t":"Supported","s":0},{"t":"Somewhat","s":1},{"t":"Alone","s":2}]},
+{"q":"How stressed are you feeling?","a":[{"t":"Not much","s":0},{"t":"Moderate","s":1},{"t":"Very stressed","s":2}]},
+{"q":"How safe do you feel emotionally?","a":[{"t":"Safe","s":0},{"t":"Unsure","s":1},{"t":"Unsafe","s":2}]},
+{"q":"How peaceful is your breathing?","a":[{"t":"Calm","s":0},{"t":"Shallow","s":1},{"t":"Tight","s":2}]},
+{"q":"How connected do you feel to others?","a":[{"t":"Connected","s":0},{"t":"A little distant","s":1},{"t":"Disconnected","s":2}]},
+{"q":"How heavy does life feel today?","a":[{"t":"Light","s":0},{"t":"Okay-ish","s":1},{"t":"Very heavy","s":2}]},
+{"q":"How motivated do you feel?","a":[{"t":"Motivated","s":0},{"t":"Low","s":1},{"t":"Drained","s":2}]},
+{"q":"How rushed do you feel?","a":[{"t":"Not rushed","s":0},{"t":"Somewhat","s":1},{"t":"Very rushed","s":2}]},
+{"q":"How confident do you feel today?","a":[{"t":"Confident","s":0},{"t":"Unsure","s":1},{"t":"Doubtful","s":2}]},
+{"q":"How gentle does today feel?","a":[{"t":"Gentle","s":0},{"t":"Neutral","s":1},{"t":"Harsh","s":2}]},
+{"q":"How much pressure are you under?","a":[{"t":"Low","s":0},{"t":"Moderate","s":1},{"t":"High","s":2}]},
+{"q":"How emotionally tired are you?","a":[{"t":"Not much","s":0},{"t":"Somewhat","s":1},{"t":"Exhausted","s":2}]},
+{"q":"How calm does your heart feel?","a":[{"t":"Calm","s":0},{"t":"Uneasy","s":1},{"t":"Heavy","s":2}]},
+{"q":"How balanced do your emotions feel?","a":[{"t":"Balanced","s":0},{"t":"Shaky","s":1},{"t":"All over","s":2}]},
+{"q":"How safe do you feel slowing down?","a":[{"t":"Safe","s":0},{"t":"A little anxious","s":1},{"t":"Unsafe","s":2}]},
+{"q":"How much rest do you need?","a":[{"t":"A little","s":0},{"t":"More than usual","s":1},{"t":"A lot","s":2}]},
+{"q":"How gentle is your inner voice?","a":[{"t":"Supportive","s":0},{"t":"Mixed","s":1},{"t":"Critical","s":2}]},
+{"q":"How emotionally full do you feel?","a":[{"t":"Content","s":0},{"t":"Neutral","s":1},{"t":"Empty","s":2}]},
+{"q":"How okay do you feel right now?","a":[{"t":"Okay","s":0},{"t":"Managing","s":1},{"t":"Not okay","s":2}]},
+{"q":"Have you experienced sadness today?","a":[{"t":"No","s":0},{"t":"A little","s":1},{"t":"A lot","s":2}]},
+{"q":"Have you felt anxious today?","a":[{"t":"Not at all","s":0},{"t":"Somewhat","s":1},{"t":"Very anxious","s":2}]},
+{"q":"Have you felt lonely today?","a":[{"t":"Not at all","s":0},{"t":"A little","s":1},{"t":"Very lonely","s":2}]},
+{"q":"How often did you smile today?","a":[{"t":"Many times","s":0},{"t":"Few times","s":1},{"t":"Not at all","s":2}]},
+{"q":"Have you taken care of yourself physically today?","a":[{"t":"Yes","s":0},{"t":"Somewhat","s":1},{"t":"No","s":2}]},
+{"q":"Did you eat nourishing food today?","a":[{"t":"Yes","s":0},{"t":"Partially","s":1},{"t":"No","s":2}]},
+{"q":"Did you hydrate enough today?","a":[{"t":"Yes","s":0},{"t":"Somewhat","s":1},{"t":"No","s":2}]},
+{"q":"Did you rest when needed today?","a":[{"t":"Yes","s":0},{"t":"Sometimes","s":1},{"t":"No","s":2}]},
+{"q":"Have you expressed gratitude today?","a":[{"t":"Yes","s":0},{"t":"Somewhat","s":1},{"t":"No","s":2}]},
+{"q":"Have you done something creative today?","a":[{"t":"Yes","s":0},{"t":"A little","s":1},{"t":"No","s":2}]},
+{"q":"Did you move your body today?","a":[{"t":"Yes","s":0},{"t":"A little","s":1},{"t":"Not at all","s":2}]},
+{"q":"Did you feel joy today?","a":[{"t":"Often","s":0},{"t":"Sometimes","s":1},{"t":"Rarely","s":2}]},
+{"q":"Did you take time for yourself today?","a":[{"t":"Yes","s":0},{"t":"Partially","s":1},{"t":"No","s":2}]},
+{"q":"Have you felt overwhelmed today?","a":[{"t":"Not at all","s":0},{"t":"Somewhat","s":1},{"t":"Very","s":2}]}
+]
+</script>
+
+<script>
+// ================== Bloom Quiz Script ==================
+let quizData = JSON.parse(document.getElementById('questions-data').textContent);
+let current = 0;
+let score = 0;
+
+const startBtn = document.getElementById('startBtn');
+const quizDiv = document.getElementById('quiz');
+const questionEl = document.getElementById('question');
+const answersEl = document.getElementById('answers');
+const bar = document.getElementById('bar');
+const welcome = document.getElementById('welcome');
+const resultDiv = document.getElementById('result');
+const resultTitle = document.getElementById('resultTitle');
+const resultText = document.getElementById('resultText');
+
+startBtn.onclick = () => {
+  welcome.classList.add('hidden');
+  quizDiv.classList.remove('hidden');
+  showQuestion();
+};
+
+function showQuestion(){
+  if(current>=quizData.length){
+    showResult();
+    return;
+  }
+  let q = quizData[current];
+  questionEl.innerText = q.q;
+  answersEl.innerHTML = '';
+  q.a.forEach((ans,index)=>{
+    let btn = document.createElement('button');
+    btn.innerText = ans.t;
+    btn.onclick = ()=>{
+      score += ans.s;
+      current++;
+      bar.style.width = ((current/quizData.length)*100)+'%';
+      showQuestion();
+    };
+    answersEl.appendChild(btn);
+  });
+}
+
+function showResult(){
+  quizDiv.classList.add('hidden');
+  resultDiv.classList.remove('hidden');
+  if(score<20) resultTitle.innerText="🌸 You’re glowing!";
+  else if(score<40) resultTitle.innerText="💜 Take a little pause";
+  else resultTitle.innerText="🌿 Be gentle with yourself today";
+  resultText.innerHTML = `Your score: ${score} / ${quizData.length*2}`;
+}
+</script>
+
+</body>
+</html>
